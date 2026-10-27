@@ -1,5 +1,5 @@
-$ docker image inspect ghcr.io/bermudezkenny03/laboratorio-sbom-slsa@sha256:6673ad19ddaf39ad6d70d5f3bca539ae42aed80c35a57b515cfd6be4600a7972
-Imagen:            ghcr.io/bermudezkenny03/laboratorio-sbom-slsa@sha256:6673ad19ddaf39ad6d70d5f3bca539ae42aed80c35a57b515cfd6be4600a7972
+$ docker image inspect ghcr.io/bermudezkenny03/laboratorio-sbom-slsa@sha256:300f9431b77c1db9b511169f6a3fd4a135c0d503216ae1ffadd9a70706c2b245
+Imagen:            ghcr.io/bermudezkenny03/laboratorio-sbom-slsa@sha256:300f9431b77c1db9b511169f6a3fd4a135c0d503216ae1ffadd9a70706c2b245
 Usuario:           nonroot:nonroot
 Entrypoint:        /app
 Puertos:           8080/tcp 
@@ -7,4 +7,4 @@ Capas:             13
 Tamaño:            6.7 MB
 Shell en imagen:   no (distroless: sin shell ni gestor de paquetes)
 Compilada con Go:  1.22
-Commit de origen:  841ebb7388876b9fba7e2153a012d95b900246c9
+Commit de origen:  2c663f8923fa3b86a0c0e9f8e2350ad6c76a7336
