@@ -201,7 +201,7 @@ powershell -ExecutionPolicy Bypass -File .\scripts\04-sbom-imagen.ps1 -Imagen la
 powershell -ExecutionPolicy Bypass -File .\scripts\02-escanear-sbom.ps1
 ```
 
-En CI: **Run workflow** con `go_version = 1.27`. Compara el resumen de Grype antes y después.
+En CI: **Run workflow** con `go_version = 1.27`. El job `evidencias` guarda esa ejecución en `evidencias/remediacion-go1.27/` con una tabla de antes y después frente a la línea base de Go 1.22.
 
 📸 **Evidencia 11 (opcional):** comparación de vulnerabilidades con Go 1.22 y con Go 1.27.
 

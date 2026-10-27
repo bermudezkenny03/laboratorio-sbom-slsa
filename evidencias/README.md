@@ -13,6 +13,7 @@ Las genera el job `evidencias` en cada ejecución manual del workflow (**Actions
 | `ci-04-cosign-attest.png` | Atestación del SBOM firmada con cosign y registrada en Rekor |
 | `ci-05-cosign-verify.png` | Verificación de la atestación con la identidad exacta del workflow |
 | `ci-06-slsa-verifier.png` | Verificación de la procedencia SLSA Build L3 |
+| [`remediacion-go1.27/`](remediacion-go1.27/EVIDENCIAS-CI.md) | Mismo pipeline compilando con Go 1.27: comparación de vulnerabilidades antes y después (`ci-07-remediacion.png`) |
 
 ## Ejecución local en Windows
 

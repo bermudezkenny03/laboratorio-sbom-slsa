@@ -7,19 +7,21 @@
 #   RUN_URL     URL de la ejecución de GitHub Actions
 #   RUN_NUMBER  número de la ejecución
 #   GO_VERSION  versión de Go usada para compilar
-# Requiere que los artefactos de la ejecución estén descargados en reports/ci/.
+#   CI_DIR      carpeta con los artefactos descargados (por defecto reports/ci)
+#   EV_DIR      carpeta de salida de las evidencias (por defecto evidencias)
 #
 # Salidas:
-#   reports/ci/imagen-info.txt
-#   evidencias/ci-0X-*.png   (renderizadas con Chrome headless desde las salidas reales)
-#   evidencias/EVIDENCIAS-CI.md
+#   $CI_DIR/imagen-info.txt
+#   $EV_DIR/ci-0X-*.png        (renderizadas con Chrome headless desde las salidas reales)
+#   $EV_DIR/EVIDENCIAS-CI.md
 
 set -euo pipefail
 
 : "${REF:?Falta REF}" "${RUN_URL:?Falta RUN_URL}" "${GO_VERSION:?Falta GO_VERSION}"
 RUN_NUMBER="${RUN_NUMBER:-?}"
-CI=reports/ci
-EV=evidencias
+CI="${CI_DIR:-reports/ci}"
+EV="${EV_DIR:-evidencias}"
+REPO_URL="${GITHUB_SERVER_URL:-https://github.com}/${GITHUB_REPOSITORY:-}"
 TMP=$(mktemp -d)
 mkdir -p "$EV"
 
@@ -64,26 +66,34 @@ EOF
 # ---------------------------------------------------------------------------
 # 2. Datos de SBOM, Grype, cosign y SLSA
 # ---------------------------------------------------------------------------
-N_COD=$(jq '.components | length' "$CI/sbom-codigo.cdx.json")
-N_IMG=$(jq '.components | length' "$CI/sbom-imagen.cdx.json")
+# Paquetes (bibliotecas, sistema operativo) y archivos se cuentan por separado:
+# Syft también registra cada archivo de la imagen como componente "file".
+paquetes() { jq '[.components[] | select(.type != "file")] | length' "$1"; }
+archivos() { jq '[.components[] | select(.type == "file")] | length' "$1"; }
+tabla_paquetes() {
+  jq -r '.components[] | select(.type != "file") | [.name, (.version // "-"), .type] | @tsv' "$1" \
+    | sort -t$'\t' -k3,3 -k1,1 \
+    | awk -F'\t' 'BEGIN{print "PAQUETE                                            VERSIÓN                  TIPO"}
+                  {printf "%-50s %-24s %s\n",substr($1,1,49),$2,$3}'
+}
+N_COD=$(paquetes "$CI/sbom-codigo.cdx.json");  F_COD=$(archivos "$CI/sbom-codigo.cdx.json")
+N_IMG=$(paquetes "$CI/sbom-imagen.cdx.json");  F_IMG=$(archivos "$CI/sbom-imagen.cdx.json")
 N_VULN=$(jq '.matches | length' "$CI/grype-resultados.json")
+tabla_paquetes "$CI/sbom-codigo.cdx.json" > "$TMP/sbom-codigo.txt"
+tabla_paquetes "$CI/sbom-imagen.cdx.json" > "$TMP/sbom-imagen.txt"
 
-jq -r '.components[] | [.name, (.version // "-"), .type] | @tsv' "$CI/sbom-imagen.cdx.json" \
-  | sort -k3,3 -k1,1 | awk -F'\t' 'BEGIN{printf "%-45s %-28s %s\n","COMPONENTE","VERSIÓN","TIPO"}
-                                   {printf "%-45s %-28s %s\n",$1,$2,$3}' > "$TMP/sbom-imagen.txt"
+# Conteo por severidad en orden de gravedad
+ORDEN='{"Critical":0,"High":1,"Medium":2,"Low":3,"Negligible":4,"Unknown":5}'
+sev_conteo() {
+  jq -r --argjson o "$ORDEN" '[.matches[].vulnerability.severity] | group_by(.)
+      | map({s: .[0], n: length}) | sort_by($o[.s] // 9) | .[] | "\(.s)\t\(.n)"' "$1"
+}
+SEVERIDADES=$(sev_conteo "$CI/grype-resultados.json" | awk -F'\t' '{printf "%s%s: %s", (NR>1?"  ·  ":""), $1, $2}')
+if [[ -z "$SEVERIDADES" ]]; then SEVERIDADES="sin vulnerabilidades"; fi
+TABLA_SEV=$(sev_conteo "$CI/grype-resultados.json" | awk -F'\t' '{printf "| %s | %s |\n", $1, $2}')
 
-jq -r '.components[] | [.name, (.version // "-"), .type] | @tsv' "$CI/sbom-codigo.cdx.json" \
-  | sort -k3,3 -k1,1 | awk -F'\t' 'BEGIN{printf "%-45s %-28s %s\n","COMPONENTE","VERSIÓN","TIPO"}
-                                   {printf "%-45s %-28s %s\n",substr($1,1,44),$2,$3}' > "$TMP/sbom-codigo.txt"
-
-SEVERIDADES=$(jq -r '[.matches[].vulnerability.severity] | group_by(.) | map("\(.[0]): \(length)") | join("  ·  ")' \
-  "$CI/grype-resultados.json")
-[[ -z "$SEVERIDADES" ]] && SEVERIDADES="sin vulnerabilidades"
-TABLA_SEV=$(jq -r '[.matches[].vulnerability.severity] | group_by(.) | map("| \(.[0]) | \(length) |") | .[]' \
-  "$CI/grype-resultados.json")
-
-LISTA_VULN=$(jq -r '.matches
-  | sort_by({"Critical":0,"High":1,"Medium":2,"Low":3,"Negligible":4,"Unknown":5}[.vulnerability.severity])
+LISTA_VULN=$(jq -r --argjson o "$ORDEN" '.matches
+  | sort_by($o[.vulnerability.severity] // 9)
   | .[:40][]
   | "| \(.vulnerability.id) | \(.artifact.name) \(.artifact.version) | \(.vulnerability.severity) | \((.vulnerability.fix.versions // []) | join(", ") | if . == "" then "sin fix" else . end) |"' \
   "$CI/grype-resultados.json")
@@ -130,16 +140,17 @@ HTML
 { cat "$CI/imagen-info.txt"; } > "$TMP/e1.txt"
 render "$EV/ci-01-imagen-nonroot.png" "Imagen publicada: usuario no root y base distroless" "$TMP/e1.txt"
 
-{ echo "\$ syft dir:.   →  reports/sbom-codigo.cdx.json  ($N_COD componentes)"; echo
+{ echo "\$ syft dir:.   →  sbom-codigo.cdx.json  ($N_COD paquetes, $F_COD archivos)"; echo
   cat "$TMP/sbom-codigo.txt"; echo
-  echo "\$ syft $REF   →  reports/sbom-imagen.cdx.json  ($N_IMG componentes)"; echo
+  echo "\$ syft $REF"
+  echo "  →  sbom-imagen.cdx.json  ($N_IMG paquetes, $F_IMG archivos con su hash)"; echo
   cat "$TMP/sbom-imagen.txt"; } > "$TMP/e2.txt"
 render "$EV/ci-02-sbom-codigo-vs-imagen.png" "SBOM del código vs SBOM de la imagen (Syft)" "$TMP/e2.txt"
 
 { echo "\$ grype sbom:reports/sbom-imagen.cdx.json"; echo
   head -n 60 "$CI/grype-resultados.txt"
   total=$(wc -l < "$CI/grype-resultados.txt")
-  if (( total > 60 )); then echo "... (+$((total-60)) líneas en reports/ci/grype-resultados.txt)"; fi
+  if (( total > 60 )); then echo "... (+$((total-60)) líneas en $CI/grype-resultados.txt)"; fi
   echo; echo "Resumen: $SEVERIDADES  ·  total: $N_VULN"; } > "$TMP/e3.txt"
 render "$EV/ci-03-grype.png" "Escaneo de vulnerabilidades del SBOM con Grype" "$TMP/e3.txt"
 
@@ -152,7 +163,7 @@ render "$EV/ci-04-cosign-attest.png" "Atestación firmada del SBOM con cosign (k
   echo "--- Declaración in-toto verificada ---"
   echo "predicateType: $ATEST_TIPO"
   echo "subject:       $ATEST_SUJETO"
-  echo "componentes:   $ATEST_COMP"; } > "$TMP/e5.txt"
+  echo "componentes:   $ATEST_COMP (paquetes + archivos)"; } > "$TMP/e5.txt"
 render "$EV/ci-05-cosign-verify.png" "Verificación de la atestación con identidad exacta" "$TMP/e5.txt"
 
 { echo "\$ slsa-verifier verify-image $REF --source-uri github.com/${GITHUB_REPOSITORY:-?} --source-branch main"; echo
@@ -166,14 +177,49 @@ render "$EV/ci-05-cosign-verify.png" "Verificación de la atestación con identi
 render "$EV/ci-06-slsa-verifier.png" "Verificación de la procedencia SLSA Build L3" "$TMP/e6.txt"
 
 # ---------------------------------------------------------------------------
-# 4. Informe en Markdown
+# 4. Comparación con la línea base (solo en ejecuciones de remediación)
+# ---------------------------------------------------------------------------
+COMPARACION=""
+BASE=reports/ci/grype-resultados.json
+if [[ "$CI" != "reports/ci" && -f "$BASE" ]]; then
+  GO_BASE=$(jq -r '[.matches[] | select(.artifact.name == "stdlib") | .artifact.version][0] // "?"' "$BASE")
+  GO_NUEVO=$(jq -r '.components[] | select(.name == "stdlib") | .version' "$CI/sbom-imagen.cdx.json" | head -n1)
+  N_BASE=$(jq '.matches | length' "$BASE")
+  N_BASE_CRIT=$(jq '[.matches[] | select(.vulnerability.severity == "Critical")] | length' "$BASE")
+  N_BASE_HIGH=$(jq '[.matches[] | select(.vulnerability.severity == "High")] | length' "$BASE")
+  N_CRIT=$(jq '[.matches[] | select(.vulnerability.severity == "Critical")] | length' "$CI/grype-resultados.json")
+  N_HIGH=$(jq '[.matches[] | select(.vulnerability.severity == "High")] | length' "$CI/grype-resultados.json")
+  COMPARACION=$(cat <<CMP
+## Remediación: antes y después
+
+| | Antes (línea base) | Después (esta ejecución) |
+|---|---|---|
+| Biblioteca estándar de Go | \`${GO_BASE}\` | \`${GO_NUEVO}\` |
+| Critical | ${N_BASE_CRIT} | ${N_CRIT} |
+| High | ${N_BASE_HIGH} | ${N_HIGH} |
+| **Total de vulnerabilidades** | **${N_BASE}** | **${N_VULN}** |
+
+Línea base: [\`reports/ci/\`](${REPO_URL}/tree/main/reports/ci) · Esta ejecución: [\`${CI}/\`](${REPO_URL}/tree/main/${CI})
+CMP
+)
+  { echo "Antes  (stdlib $GO_BASE):  Critical $N_BASE_CRIT · High $N_BASE_HIGH · total $N_BASE"
+    echo "Después(stdlib $GO_NUEVO): Critical $N_CRIT · High $N_HIGH · total $N_VULN"; echo
+    echo "\$ grype sbom:$CI/sbom-imagen.cdx.json"; echo
+    head -n 40 "$CI/grype-resultados.txt"; } > "$TMP/e7.txt"
+  render "$EV/ci-07-remediacion.png" "Remediación: vulnerabilidades antes y después de actualizar Go" "$TMP/e7.txt"
+fi
+
+# ---------------------------------------------------------------------------
+# 5. Informe en Markdown
 # ---------------------------------------------------------------------------
 cat > "$EV/EVIDENCIAS-CI.md" <<EOF
 # Evidencias del pipeline en GitHub Actions
 
 Generadas automáticamente a partir de las salidas reales de la ejecución
 [#${RUN_NUMBER}](${RUN_URL}) del workflow \`sbom-slsa\` (${FECHA}).
-Los archivos completos están en [\`reports/ci/\`](../reports/ci/).
+Los archivos completos están en [\`${CI}/\`](${REPO_URL}/tree/main/${CI}).
+
+${COMPARACION}
 
 | Dato | Valor |
 |---|---|
@@ -190,13 +236,18 @@ Usuario \`${USUARIO}\`, base distroless (shell en la imagen: ${SHELL_EN_IMAGEN})
 
 ## 2. SBOM del código vs SBOM de la imagen
 
-| Origen | Componentes | Archivos |
-|---|---|---|
-| Código | ${N_COD} | \`sbom-codigo.cdx.json\`, \`sbom-codigo.spdx.json\` |
-| Imagen | ${N_IMG} | \`sbom-imagen.cdx.json\`, \`sbom-imagen.spdx.json\` |
+| Origen | Paquetes | Archivos inventariados | SBOM |
+|---|---|---|---|
+| Código | ${N_COD} | ${F_COD} | \`sbom-codigo.cdx.json\`, \`sbom-codigo.spdx.json\` |
+| Imagen | ${N_IMG} | ${F_IMG} | \`sbom-imagen.cdx.json\`, \`sbom-imagen.spdx.json\` |
 
-El SBOM del código solo ve \`go.mod\` y las GitHub Actions del workflow. El de la imagen incluye los paquetes
-del sistema base y la biblioteca estándar de Go compilada en el binario: es la evidencia principal.
+El SBOM del código solo ve \`go.mod\` y las GitHub Actions del workflow. El de la imagen incluye el sistema
+operativo base, sus paquetes Debian, la biblioteca estándar de Go compilada en el binario y cada archivo de la
+imagen con su hash: es la evidencia principal.
+
+\`\`\`
+$(cat "$TMP/sbom-imagen.txt")
+\`\`\`
 
 ![SBOM código vs imagen](ci-02-sbom-codigo-vs-imagen.png)
 
@@ -215,7 +266,7 @@ $( if [[ -n "$LISTA_VULN" ]]; then printf '| CVE | Componente | Severidad | Vers
 
 - Tipo de predicado: \`${ATEST_TIPO}\`
 - Sujeto: \`${ATEST_SUJETO}\`
-- Componentes en el SBOM firmado: ${ATEST_COMP}
+- Componentes en el SBOM firmado: ${ATEST_COMP} (paquetes + archivos)
 - Entrada en el log de transparencia Rekor: ${REKOR:+[${REKOR}](https://search.sigstore.dev/?logIndex=${REKOR})}
 - Firmante verificado: el workflow \`.github/workflows/sbom-slsa.yml\` de este repositorio (emisor \`https://token.actions.githubusercontent.com\`)
 
@@ -236,7 +287,7 @@ $( if [[ -n "$LISTA_VULN" ]]; then printf '| CVE | Componente | Severidad | Vers
 
 | Nivel | Requisito | Evidencia | Estado |
 |---|---|---|---|
-| Build L1 | Existe procedencia | \`reports/ci/procedencia-slsa.json\` | Cumple |
+| Build L1 | Existe procedencia | \`${CI}/procedencia-slsa.json\` | Cumple |
 | Build L2 | Plataforma alojada y procedencia firmada | GitHub Actions + firma Sigstore verificada por \`slsa-verifier\` | Cumple |
 | Build L3 | Builder endurecido y aislado | \`slsa-github-generator\` en workflow reutilizable aislado, runners efímeros | Cumple |
 EOF
