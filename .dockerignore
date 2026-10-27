@@ -1,0 +1,12 @@
+# Solo entra al contexto de build lo necesario para compilar
+.git
+.github
+reports
+scripts
+evidencias
+tools
+*.md
+Dockerfile
+.dockerignore
+.gitignore
+.gitattributes

@@ -1,0 +1,7 @@
+# Scripts de PowerShell con CRLF para Windows; el resto con LF
+*.ps1  text eol=crlf
+*.sh   text eol=lf
+*.go   text eol=lf
+*.yml  text eol=lf
+*.md   text eol=lf
+Dockerfile text eol=lf
