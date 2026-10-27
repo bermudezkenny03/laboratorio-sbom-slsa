@@ -150,12 +150,13 @@ El workflow [`.github/workflows/sbom-slsa.yml`](.github/workflows/sbom-slsa.yml)
 | `build` | Construye y publica la imagen en GHCR, genera SBOM del código y de la imagen (CycloneDX y SPDX) sobre el digest publicado, escanea con Grype, firma el SBOM con `cosign attest` (keyless con el OIDC de GitHub) y lo verifica exigiendo la identidad exacta del workflow |
 | `procedencia` | Genera procedencia SLSA firmada con el builder oficial [`slsa-github-generator`](https://github.com/slsa-framework/slsa-github-generator) (Build L3) y la sube a GHCR junto a la imagen |
 | `verificar-procedencia` | Verifica la procedencia con `slsa-verifier`: builder confiable, repositorio y rama de origen |
+| `evidencias` | Solo en ejecución manual: guarda en el repo las salidas reales de la ejecución (`reports/ci/`), un informe y capturas (`evidencias/`) |
 
 Controles de endurecimiento aplicados:
 
 - `permissions: {}` global y permisos mínimos por job
 - Actions de terceros fijadas por SHA de commit (el generador SLSA y el instalador de slsa-verifier se referencian por tag porque así lo exigen)
-- `persist-credentials: false` en el checkout
+- `persist-credentials: false` en el checkout de build (solo el job `evidencias` conserva credenciales para hacer commit)
 - Variables de contexto pasadas por `env`, no interpoladas en scripts (evita inyección)
 - Runners efímeros alojados por GitHub
 - SBOM generado en el mismo job que produce el artefacto y sobre su digest
@@ -169,10 +170,8 @@ Controles de endurecimiento aplicados:
 | `escaneo-y-atestacion` | resultados de Grype, salida de `cosign attest` y `cosign verify-attestation` |
 | `procedencia-slsa` | procedencia verificada y salida de `slsa-verifier` |
 
-📸 **Evidencia 7:** ejecución del workflow con los tres jobs en verde.
-📸 **Evidencia 8:** *Summary* de la ejecución (tablas de SBOM, vulnerabilidades y nivel SLSA) y la lista de artefactos.
-📸 **Evidencia 9:** log del paso "Verificar la atestación con la identidad exacta del workflow".
-📸 **Evidencia 10:** log del paso "Verificar con slsa-verifier" con `PASSED: Verified SLSA provenance`.
+📄 **Evidencias del CI:** [`evidencias/EVIDENCIAS-CI.md`](evidencias/EVIDENCIAS-CI.md) reúne el informe y las capturas de la última ejecución manual, generados a partir de sus salidas reales.
+📸 **Evidencia 7:** pestaña Actions con los jobs en verde y el *Summary* de la ejecución.
 
 ### 3.1 Verificar desde tu PC lo que firmó el CI
 
