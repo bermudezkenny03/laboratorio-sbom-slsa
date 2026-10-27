@@ -1,0 +1,67 @@
+NAME    INSTALLED  FIXED IN                       TYPE       VULNERABILITY  SEVERITY  EPSS         RISK   
+stdlib  go1.22.12  *1.24.12, 1.25.6               go-module  GO-2026-4341   High      2.3% (83rd)  1.7    
+stdlib  go1.22.12  *1.25.13, 1.26.6, 1.27.0-rc.3  go-module  GO-2026-5026   High      1.8% (78th)  1.4    
+stdlib  go1.22.12  *1.24.13, 1.25.7, 1.26.0-rc.3  go-module  GO-2026-4337   Critical  0.9% (59th)  0.9    
+stdlib  go1.22.12  *1.23.8, 1.24.2                go-module  GO-2025-3563   Critical  0.8% (57th)  0.7    
+stdlib  go1.22.12  *1.25.10, 1.26.3               go-module  GO-2026-4981   High      0.9% (58th)  0.7    
+stdlib  go1.22.12  *1.25.10, 1.26.3               go-module  GO-2026-4918   High      0.8% (57th)  0.6    
+stdlib  go1.22.12  *1.25.10, 1.26.3               go-module  GO-2026-4977   High      0.8% (56th)  0.6    
+stdlib  go1.22.12  *1.25.10, 1.26.3               go-module  GO-2026-4986   High      0.8% (55th)  0.6    
+stdlib  go1.22.12  *1.25.8, 1.26.1                go-module  GO-2026-4601   High      0.8% (55th)  0.6    
+stdlib  go1.22.12  1.26.9                         go-module  GO-2026-6612   Critical  0.6% (49th)  0.6    
+stdlib  go1.22.12  *1.26.9, 1.27.2                go-module  GO-2026-6604   Critical  0.6% (45th)  0.5    
+stdlib  go1.22.12  *1.24.8, 1.25.2                go-module  GO-2025-4009   High      0.7% (51st)  0.5    
+stdlib  go1.22.12  *1.24.8, 1.25.2                go-module  GO-2025-4006   High      0.6% (50th)  0.5    
+stdlib  go1.22.12  *1.25.10, 1.26.3               go-module  GO-2026-4971   High      0.6% (50th)  0.5    
+stdlib  go1.22.12  1.26.9                         go-module  GO-2026-6603   High      0.6% (49th)  0.5    
+stdlib  go1.22.12  *1.25.9, 1.26.2                go-module  GO-2026-4870   High      0.6% (49th)  0.5    
+stdlib  go1.22.12  *1.25.9, 1.26.2                go-module  GO-2026-4947   High      0.6% (49th)  0.5    
+stdlib  go1.22.12  1.26.9                         go-module  GO-2026-6611   High      0.6% (49th)  0.5    
+stdlib  go1.22.12  *1.25.11, 1.26.4               go-module  GO-2026-5037   High      0.6% (47th)  0.4    
+stdlib  go1.22.12  *1.25.13, 1.26.6, 1.27.0-rc.3  go-module  GO-2026-5972   High      0.6% (46th)  0.4    
+stdlib  go1.22.12  *1.25.13, 1.26.6, 1.27.0-rc.3  go-module  GO-2026-6089   High      0.6% (46th)  0.4    
+stdlib  go1.22.12  *1.25.13, 1.26.6, 1.27.0-rc.3  go-module  GO-2026-6090   High      0.6% (46th)  0.4    
+stdlib  go1.22.12  *1.25.13, 1.26.6, 1.27.0-rc.3  go-module  GO-2026-6088   High      0.6% (46th)  0.4    
+stdlib  go1.22.12  *1.24.12, 1.25.6               go-module  GO-2026-4342   Medium    0.7% (54th)  0.4    
+stdlib  go1.22.12  *1.25.11, 1.26.4               go-module  GO-2026-5038   High      0.6% (46th)  0.4    
+stdlib  go1.22.12  *1.23.10, 1.24.4               go-module  GO-2025-3751   Medium    0.7% (51st)  0.4    
+stdlib  go1.22.12  *1.26.9, 1.27.2                go-module  GO-2026-6607   High      0.5% (43rd)  0.4    
+stdlib  go1.22.12  *1.26.9, 1.27.2                go-module  GO-2026-6608   High      0.5% (43rd)  0.4    
+stdlib  go1.22.12  1.26.9                         go-module  GO-2026-6617   High      0.5% (41st)  0.4    
+stdlib  go1.22.12  *1.26.9, 1.27.2                go-module  GO-2026-6609   High      0.5% (41st)  0.4    
+stdlib  go1.22.12  *1.26.9, 1.27.2                go-module  GO-2026-6605   High      0.5% (40th)  0.4    
+stdlib  go1.22.12  *1.24.11, 1.25.5               go-module  GO-2025-4155   High      0.5% (39th)  0.3    
+stdlib  go1.22.12  1.26.9                         go-module  GO-2026-6610   High      0.4% (36th)  0.3    
+stdlib  go1.22.12  *1.23.12, 1.24.6               go-module  GO-2025-3956   Medium    0.5% (45th)  0.3    
+stdlib  go1.22.12  *1.26.9, 1.27.2                go-module  GO-2026-6613   High      0.4% (35th)  0.3    
+stdlib  go1.22.12  *1.24.9, 1.25.3                go-module  GO-2025-4007   High      0.4% (34th)  0.3    
+stdlib  go1.22.12  *1.25.13, 1.26.6, 1.27.0-rc.3  go-module  GO-2026-6218   Medium    0.5% (45th)  0.3    
+stdlib  go1.22.12  *1.24.8, 1.25.2                go-module  GO-2025-4012   Medium    0.6% (46th)  0.3    
+stdlib  go1.22.12  *1.24.8, 1.25.2                go-module  GO-2025-4011   Medium    0.6% (46th)  0.3    
+stdlib  go1.22.12  *1.24.8, 1.25.2                go-module  GO-2025-4015   Medium    0.6% (46th)  0.3    
+stdlib  go1.22.12  *1.24.8, 1.25.2                go-module  GO-2025-4013   High      0.4% (31st)  0.3    
+stdlib  go1.22.12  *1.23.12, 1.24.6               go-module  GO-2025-3849   High      0.4% (32nd)  0.3    
+stdlib  go1.22.12  *1.25.9, 1.26.2                go-module  GO-2026-4946   High      0.4% (28th)  0.3    
+stdlib  go1.22.12  *1.24.8, 1.25.2                go-module  GO-2025-4008   Medium    0.5% (40th)  0.2    
+stdlib  go1.22.12  *1.24.8, 1.25.2                go-module  GO-2025-4010   Medium    0.5% (40th)  0.2    
+stdlib  go1.22.12  *1.24.8, 1.25.2                go-module  GO-2025-4014   Medium    0.4% (38th)  0.2    
+stdlib  go1.22.12  *1.25.10, 1.26.3               go-module  GO-2026-4980   Medium    0.4% (30th)  0.2    
+stdlib  go1.22.12  *1.25.10, 1.26.3               go-module  GO-2026-4976   Medium    0.4% (32nd)  0.2    
+stdlib  go1.22.12  *1.23.7, 1.24.1                go-module  GO-2025-3503   Medium    0.4% (36th)  0.2    
+stdlib  go1.22.12  *1.25.12, 1.26.5, 1.27.0-rc.2  go-module  GO-2026-5856   Medium    0.4% (31st)  0.2    
+stdlib  go1.22.12  *1.25.11, 1.26.4               go-module  GO-2026-5039   Medium    0.4% (30th)  0.2    
+stdlib  go1.22.12  *1.25.8, 1.26.1                go-module  GO-2026-4603   Medium    0.3% (27th)  0.2    
+stdlib  go1.22.12  *1.25.12, 1.26.5, 1.27.0-rc.2  go-module  GO-2026-4970   High      0.2% (13th)  0.2    
+stdlib  go1.22.12  *1.25.10, 1.26.3               go-module  GO-2026-4982   Medium    0.3% (24th)  0.2    
+stdlib  go1.22.12  *1.25.13, 1.26.6, 1.27.0-rc.3  go-module  GO-2026-6091   Medium    0.3% (23rd)  0.2    
+stdlib  go1.22.12  *1.23.10, 1.24.4               go-module  GO-2025-3750   Medium    0.3% (25th)  0.2    
+stdlib  go1.22.12  *1.24.12, 1.25.6               go-module  GO-2026-4340   Medium    0.3% (25th)  0.2    
+stdlib  go1.22.12  *1.25.9, 1.26.2                go-module  GO-2026-4864   Medium    0.3% (21st)  0.2    
+stdlib  go1.22.12  *1.24.11, 1.25.5               go-module  GO-2025-4175   Medium    0.3% (20th)  0.2    
+stdlib  go1.22.12  *1.25.9, 1.26.2                go-module  GO-2026-4865   Medium    0.3% (21st)  0.2    
+stdlib  go1.22.12  *1.26.9, 1.27.2                go-module  GO-2026-6599   Medium    0.3% (21st)  0.2    
+stdlib  go1.22.12  *1.26.9, 1.27.2                go-module  GO-2026-6600   Medium    0.3% (21st)  0.2    
+stdlib  go1.22.12  *1.25.9, 1.26.2                go-module  GO-2026-4869   Medium    0.3% (21st)  0.2    
+stdlib  go1.22.12  *1.26.10, 1.27.3               go-module  GO-2026-6809   Unknown   0.3% (22nd)  0.1    
+stdlib  go1.22.12  *1.23.9, 1.24.3                go-module  GO-2026-4403   Low       0.2% (14th)  < 0.1  
+stdlib  go1.22.12  *1.25.8, 1.26.1                go-module  GO-2026-4602   Low       0.2% (10th)  < 0.1
