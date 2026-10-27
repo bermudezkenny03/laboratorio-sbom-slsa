@@ -1,0 +1,14 @@
+Flag --new-bundle-format has been deprecated, this will be the only supported format in future versions
+
+Verification for ghcr.io/bermudezkenny03/laboratorio-sbom-slsa@sha256:2c83dd777f8470b830baec7a0584f01ca7df30d51949b63f6b1c379f3228bd43 --
+The following checks were performed on each of these signatures:
+  - The cosign claims were validated
+  - Existence of the claims in the transparency log was verified offline
+  - The code-signing certificate was verified using trusted certificate authority certificates
+Certificate subject: https://github.com/bermudezkenny03/laboratorio-sbom-slsa/.github/workflows/sbom-slsa.yml@refs/heads/main
+Certificate issuer URL: https://token.actions.githubusercontent.com
+GitHub Workflow Trigger: workflow_dispatch
+GitHub Workflow SHA: 3a45a0d8e1f4f3848c62a930071991b2d2d76012
+GitHub Workflow Name: sbom-slsa
+GitHub Workflow Repository: bermudezkenny03/laboratorio-sbom-slsa
+GitHub Workflow Ref: refs/heads/main

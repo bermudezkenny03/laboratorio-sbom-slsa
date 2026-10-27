@@ -1,0 +1,10 @@
+$ docker image inspect ghcr.io/bermudezkenny03/laboratorio-sbom-slsa@sha256:2c83dd777f8470b830baec7a0584f01ca7df30d51949b63f6b1c379f3228bd43
+Imagen:            ghcr.io/bermudezkenny03/laboratorio-sbom-slsa@sha256:2c83dd777f8470b830baec7a0584f01ca7df30d51949b63f6b1c379f3228bd43
+Usuario:           nonroot:nonroot
+Entrypoint:        /app
+Puertos:           8080/tcp 
+Capas:             13
+Tamaño:            8.3 MB
+Shell en imagen:   no (distroless: sin shell ni gestor de paquetes)
+Compilada con Go:  1.27
+Commit de origen:  3a45a0d8e1f4f3848c62a930071991b2d2d76012
